@@ -7,7 +7,8 @@ class Clock extends Component {
         super(props);
         this.state = {
             date: Date.now(),
-            timezone: this.props.timezone * 3600 * 1000
+            timezone: this.props.timezone * 3600 * 1000,
+            stopped: false
         }
     }
 
@@ -19,10 +20,25 @@ class Clock extends Component {
         const minusTime = dateFromState.getTime() + this.state.timezone;
         const finalDate = new Date(minusTime);
 
-        return <h2>In {this.props.country} is {finalDate.toLocaleDateString() +
-        ' - ' + finalDate.toLocaleTimeString()} </h2>;
+        return <h2> In {this.props.country} is {finalDate.toLocaleDateString() +
+                    ' - ' + finalDate.toLocaleTimeString()}
+                    <button onClick={this.toogleWatch}>
+                        {this.state.stopped ? 'Start' : 'Stop'}
+                    </button>
+               </h2>;
 
     }
+
+    /** Avvia o interrompe il timer */
+    toogleWatch = (event) => {
+        this.setState((previousState) => {
+            /** Check e modifica del valore 'stopped' dello state */
+           previousState.stopped ? this.startWatch() : clearInterval(this.clockViewInterval);
+           return {
+               stopped: !previousState.stopped
+           }
+        });
+    };
 
     tick = () => {
 
@@ -39,13 +55,16 @@ class Clock extends Component {
         });
     };
 
-    /** Questo metodo viene chiamato automaticamente da React subito dopo che il componente
-     * è stato creato */
-    componentDidMount() {
-
+    startWatch() {
         /** L'intervallo legato al cambio dell'ora viene registrato con 'clockViewInterval' e
          * quando il componente viene distrutto, viene eliminato da 'clearInterval' */
         this.clockViewInterval = setInterval(this.tick, 1000);
+    }
+
+    /** Questo metodo viene chiamato automaticamente da React subito dopo che il componente
+     * è stato creato */
+    componentDidMount() {
+        this.startWatch();
     }
 
     /** Questo metodo viene chiamato automaticamente da React quando il componente viene distrutto */
