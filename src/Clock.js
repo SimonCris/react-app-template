@@ -1,12 +1,61 @@
-import React from 'react';
+import React, {Component} from 'react';
 
-function clock(props) {
+class Clock extends Component {
 
-    const minusTime = Date.now() + props.timezone * 3600 * 1000;
-    const finalDate = new Date(minusTime);
+    /** Lo stato del componente deve essere inizializzato solamente nel costruttore del componente */
+    constructor(props) {
+        super(props);
+        this.state = {
+            date: Date.now(),
+            timezone: this.props.timezone * 3600 * 1000
+        }
+    }
 
-    return <h2>In {props.country} is { finalDate.toLocaleDateString() +
-                ' - ' + finalDate.toLocaleTimeString()} </h2>;
+    /** Questo metodo renderizza il componente sul browser e viene chiamato automaticamente
+     * da React */
+    render() {
+
+        const dateFromState = new Date(this.state.date);
+        const minusTime = dateFromState.getTime() + this.state.timezone;
+        const finalDate = new Date(minusTime);
+
+        return <h2>In {this.props.country} is {finalDate.toLocaleDateString() +
+        ' - ' + finalDate.toLocaleTimeString()} </h2>;
+
+    }
+
+    tick = () => {
+
+        /** Tramite setState possiamo cambiare lo stato della proprietà che ci interessa
+         * lasciando invariate le altre. setState richiama automaticamente il metodo render()
+         * dopo che le proprietà vengono modificate.
+         * Utilizzando una funzione anonima che prende in input lo stato precedente, possiamo
+         * aggiornare i campi dello stato a partire dai valori dello stato precedente
+         * (in questo caso aggiorniamo la data a partire dalla precedente) */
+        this.setState( (previousState, props) => {
+            return {
+                date: previousState.date + 1000
+            }
+        });
+    };
+
+    /** Questo metodo viene chiamato automaticamente da React subito dopo che il componente
+     * è stato creato */
+    componentDidMount() {
+
+        /** L'intervallo legato al cambio dell'ora viene registrato con 'clockViewInterval' e
+         * quando il componente viene distrutto, viene eliminato da 'clearInterval' */
+        this.clockViewInterval = setInterval(this.tick, 1000);
+    }
+
+    /** Questo metodo viene chiamato automaticamente da React quando il componente viene distrutto */
+    componentWillUnmount() {
+
+        /** ClearInterval è un metodo di ReactDOM che permette di terminare tutti gli
+         * interval che sono stati attivati dal componente */
+        clearInterval(this.clockViewInterval);
+    }
+
 }
 
-export default clock;
+export default Clock;
