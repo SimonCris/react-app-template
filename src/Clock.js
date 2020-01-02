@@ -8,6 +8,7 @@ class Clock extends Component {
         this.state = {
             date: Date.now(),
             timezone: this.props.timezone * 3600 * 1000,
+            country: this.props.country,
             stopped: false
         }
     }
@@ -20,12 +21,12 @@ class Clock extends Component {
         const minusTime = dateFromState.getTime() + this.state.timezone;
         const finalDate = new Date(minusTime);
 
-        return <h2> In {this.props.country} is {finalDate.toLocaleDateString() +
-                    ' - ' + finalDate.toLocaleTimeString()}
+        return <li> In {this.state.country} is <br/>
+                    <span className="clock"> {finalDate.toLocaleTimeString()} </span> <br/>
                     <button onClick={this.toogleWatch}>
                         {this.state.stopped ? 'Start' : 'Stop'}
                     </button>
-               </h2>;
+               </li>;
 
     }
 
